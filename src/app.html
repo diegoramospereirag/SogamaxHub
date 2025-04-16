@@ -1,0 +1,490 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>SogamaxHub. - Sistema de Controle de Visitantes</title>
+    <link rel="stylesheet" href="/public/css/app.css" />
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/remixicon@4.6.0/fonts/remixicon.min.css"
+    />
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
+  </head>
+  <body>
+    <div class="loading-screen" id="loadingScreen">
+      <div class="loading-spinner"></div>
+      <div class="loading-text">Carregando dashboard...</div>
+    </div>
+
+    <div class="bubble-container" id="bubble-container"></div>
+
+    <aside class="app-sidebar">
+      <div class="sidebar-top">
+        <h1 class="app-logo">
+          <span>SogamaxHub.</span>
+        </h1>
+      </div>
+      <nav class="main-menu">
+        <ul>
+          <li>
+            <a href="#dashboard" class="nav-link" data-page="dashboard">
+              <i class="ri-dashboard-line"></i>
+              <span>Dashboard</span>
+            </a>
+          </li>
+          <li>
+            <a href="#convidados" class="nav-link" data-page="convidados">
+              <i class="ri-group-line"></i>
+              <span>Convidados</span>
+            </a>
+          </li>
+          <li>
+            <a href="#registros" class="nav-link" data-page="registros">
+              <i class="ri-file-list-3-line"></i>
+              <span>Registros</span>
+            </a>
+            <a href="#sair" class="nav-link" data-page="sair">
+              <i class="ri-logout-box-r-line"></i>
+              <span>Sair</span>
+            </a>
+          </li>
+        </ul>
+      </nav>
+    </aside>
+
+    <main class="app-content">
+      <section id="dashboard" class="content-page active-content" data-page="dashboard">
+        <header class="content-header">
+          <div class="header-main">
+            <h1>Dashboard</h1>
+            <p>Visitas e convidados sob controle, em um só lugar 📊</p>
+          </div>
+          <div class="header-buttons">
+            <button class="btn primary-btn" id="newVisitaBtn">
+              <i class="ri-user-add-line"></i>
+              <span>Registrar Visita</span>
+            </button>
+            <button class="btn secondary-btn" id="newConvidadoBtn">
+              <i class="ri-user-add-line"></i>
+              <span>Novo Convidado</span>
+            </button>
+          </div>
+        </header>
+
+        <!-- Stats Cards -->
+        <div class="metrics-grid">
+          <div class="metric-card">
+            <div class="metric-title">
+              <h3>Total de Convidados</h3>
+              <i class="ri-group-line metric-icon"></i>
+            </div>
+            <div class="metric-value"></div>
+          </div>
+
+          <div class="metric-card">
+            <div class="metric-title">
+              <h3>Visitas Ativas</h3>
+              <i class="ri-user-follow-line metric-icon"></i>
+            </div>
+            <div class="metric-value"></div>
+          </div>
+
+          <div class="metric-card">
+            <div class="metric-title">
+              <h3>Visitas Hoje</h3>
+              <i class="ri-calendar-check-line metric-icon"></i>
+            </div>
+            <div class="metric-value"></div>
+          </div>
+
+          <div class="metric-card">
+            <div class="metric-title">
+              <h3>Visitas na Semana</h3>
+              <i class="ri-time-line metric-icon"></i>
+            </div>
+            <div class="metric-value"></div>
+          </div>
+        </div>
+
+        <div class="data-panel">
+          <div class="panel-header">
+            <h2>Visitantes Ativos</h2>
+            <div class="panel-actions">
+              <button class="btn text-btn">
+                <i class="ri-refresh-line"></i>
+                <span>Atualizar</span>
+              </button>
+            </div>
+          </div>
+
+          <div class="table-wrapper">
+            <table class="records-table">
+              <thead>
+                <tr>
+                  <th>Visitante</th>
+                  <th>Crachá</th>
+                  <th>Motivo</th>
+                  <th>Responsável</th>
+                  <th>Check-in</th>
+                  <th>Tempo</th>
+                  <th>Ações</th>
+                </tr>
+              </thead>
+              <tbody></tbody>
+            </table>
+          </div>
+
+          <div class="table-summary">
+            <div class="summary-info">Mostrando 1 de 8 visitantes ativos</div>
+            <div class="pagination-controls">
+              <button class="btn text-btn" disabled>
+                <i class="ri-arrow-left-s-line"></i>
+              </button>
+              <span>Página 1 de 2</span>
+              <button class="btn text-btn">
+                <i class="ri-arrow-right-s-line"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="convidados" class="content-page" data-page="convidados">
+        <header class="content-header">
+          <div class="header-main">
+            <h1>Convidados</h1>
+            <p>Gestão inteligente dos convidados cadastrados no sistema 👥</p>
+          </div>
+          <div class="header-buttons">
+            <button id="newConvidadoBtn2" class="btn primary-btn">
+              <i class="ri-user-add-line"></i>
+              <span>Novo Convidado</span>
+            </button>
+            <button class="btn secondary-btn" id="exportBtn">
+              <i class="ri-download-line"></i>
+              <span>Exportar</span>
+            </button>
+          </div>
+        </header>
+
+        <div class="data-panel">
+          <div class="search-panel">
+            <div class="search-box">
+              <i class="ri-search-line"></i>
+              <input type="text" placeholder="Buscar por nome" id="searchInput" />
+            </div>
+          </div>
+
+          <div class="table-wrapper">
+            <table class="records-table">
+              <thead>
+                <tr>
+                  <th>Nome</th>
+                  <th>Empresa</th>
+                  <th>Documento</th>
+                  <th>Contato</th>
+                  <th>Cadastro</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>
+                    <div class="visitor-info">
+                      <strong>Diego Silva</strong>
+                    </div>
+                  </td>
+                  <td>Tech Solutions</td>
+                  <td>133.795.287-73</td>
+                  <td>(22) 99783-3129</td>
+                  <td>15/04/2025</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="table-summary">
+            <div class="summary-info">Mostrando 1-10 de 128 convidados</div>
+            <div class="pagination-footer">
+              <button id="prevPage" class="btn">Anterior</button>
+              <span id="pageInfo"></span>
+              <button id="nextPage" class="btn">Próxima</button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="registros" class="content-page" data-page="registros">
+        <header class="content-header">
+          <div class="header-main">
+            <div class="header-main">
+              <h1>Histórico de Visitas</h1>
+              <p>Consulte facilmente registros de acessos anteriores 🔍</p>
+            </div>
+          </div>
+          <div class="header-buttons">
+            <button class="btn secondary-btn">
+              <i class="ri-download-line"></i>
+              <span>Exportar</span>
+            </button>
+          </div>
+        </header>
+
+        <div class="data-panel">
+          <div class="filter-panel">
+            <div class="search-box">
+              <i class="ri-search-line"></i>
+              <input type="search" placeholder="Buscar por nome, crachá ou motivo" />
+            </div>
+          </div>
+
+          <div class="table-wrapper">
+            <table class="records-table">
+              <thead>
+                <tr>
+                  <th>Visitante</th>
+                  <th>Crachá</th>
+                  <th>Check-in</th>
+                  <th>Check-out</th>
+                  <th>Duração</th>
+                  <th>Motivo</th>
+                  <th>Anfitrião</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>Diego Silva</td>
+                  <td>V1003</td>
+                  <td>
+                    <div>10/04/2025</div>
+                    <div class="secondary-text">16:45</div>
+                  </td>
+                  <td>
+                    <div>-</div>
+                    <div class="secondary-text">-</div>
+                  </td>
+                  <td>
+                    <span class="status-tag warning-tag">Em andamento</span>
+                  </td>
+                  <td>Manutenção</td>
+                  <td>Fernando Costa</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <section id="registrar-visita" class="content-page" data-page="registrar-visita">
+        <header class="content-header">
+          <div class="header-main">
+            <h1><i class="ri-user-received-line"></i> Registrar Visita</h1>
+            <p>Realize o check-in de convidados e visitantes com agilidade 📝</p>
+          </div>
+          <button class="btn text-btn back-btn">
+            <i class="ri-arrow-left-line"></i>
+            <span>Voltar</span>
+          </button>
+        </header>
+
+        <div class="data-panel">
+          <form class="form-container" id="visita-form">
+            <div class="form-header">
+              <h2><i class="ri-clipboard-line"></i> Formulário de Visita</h2>
+              <p class="form-subtitle">Preencha todos os campos obrigatórios</p>
+            </div>
+
+            <div class="form-layout two-columns">
+              <div class="form-column">
+                <div class="input-group">
+                  <label for="visitor-name">
+                    <i class="ri-user-line"></i> Convidado <span class="required-field">*</span>
+                  </label>
+                  <div class="search-container">
+                    <input
+                      type="text"
+                      id="visitor-name"
+                      class="search-input"
+                      placeholder="Digite o nome do convidado..."
+                      required
+                      autocomplete="off"
+                    />
+
+                    <div class="search-results" id="guest-results">
+                      <div class="loading-results">
+                        <i class="ri-loader-4-line spin"></i> Buscando convidados...
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="input-group">
+                  <label for="visit-purpose">
+                    <i class="ri-question-line"></i> Motivo da Visita
+                    <span class="required-field">*</span>
+                  </label>
+                  <div class="select-wrapper">
+                    <select id="visit-purpose" required>
+                      <option value="" disabled selected>Selecione o motivo</option>
+                      <option value="Reunião">Reunião</option>
+                      <option value="Entrevista">Entrevista</option>
+                      <option value="Manutenção">Manutenção</option>
+                      <option value="Entrega">Entrega</option>
+                      <option value="Outros">Outro</option>
+                    </select>
+                    <i class="ri-arrow-down-s-line select-arrow"></i>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Coluna 2 -->
+              <div class="form-column">
+                <div class="input-group">
+                  <label for="visitor-host">
+                    <i class="ri-user-star-line"></i> Anfitrião
+                    <span class="required-field">*</span>
+                  </label>
+                  <div class="search-container">
+                    <input
+                      type="text"
+                      id="visitor-host"
+                      class="search-input"
+                      placeholder="Digite o nome do anfitrião..."
+                      required
+                      autocomplete="off"
+                    />
+                    <div class="search-results" id="host-results"></div>
+                  </div>
+                </div>
+
+                <div class="input-group">
+                  <label for="visitor-badge">
+                    <i class="ri-id-card-line"></i> Crachá <span class="required-field">*</span>
+                  </label>
+                  <input
+                    type="text"
+                    id="visitor-badge"
+                    placeholder="Número do crachá"
+                    required
+                    maxlength="6"
+                    pattern="[0-9]{6}"
+                    title="Digite apenas números (6 dígitos)"
+                  />
+                </div>
+                <input type="hidden" id="visit-status" value="ativo" />
+              </div>
+            </div>
+
+            <div class="form-footer">
+              <button type="reset" class="btn text-btn">
+                <i class="ri-close-line"></i>
+                <span>Limpar</span>
+              </button>
+              <button type="submit" class="btn primary-btn">
+                <i class="ri-check-line"></i>
+                <span>Registrar Visita</span>
+              </button>
+            </div>
+          </form>
+        </div>
+      </section>
+
+      <section id="novo-convidado" class="content-page" data-page="novo-convidado">
+        <header class="content-header">
+          <div class="header-main">
+            <h1>Novo Convidado</h1>
+            <p>Adicione convidados à sua lista de registros em poucos cliques ➕</p>
+          </div>
+          <div class="header-buttons">
+            <button class="btn text-btn">
+              <i class="ri-arrow-left-line"></i>
+              <span>Voltar</span>
+            </button>
+          </div>
+        </header>
+
+        <div class="data-panel">
+          <form class="form-container">
+            <div class="form-header">
+              <h2><i class="ri-user-add-line"></i> Informações Pessoais</h2>
+            </div>
+
+            <div class="form-layout">
+              <div class="input-group">
+                <label for="guest-name">Nome Completo <span class="required-field">*</span></label>
+                <input type="text" id="guest-name" placeholder="Ex: João da Silva" required />
+              </div>
+
+              <div class="input-group">
+                <label for="guest-company">Empresa <span class="required-field">*</span></label>
+                <input type="text" id="guest-company" placeholder="Nome da empresa" required />
+              </div>
+
+              <div class="input-group">
+                <label for="guest-doc">CPF <span class="required-field">*</span></label>
+                <input type="text" id="guest-doc" placeholder="000.000.000-00" required />
+              </div>
+
+              <div class="input-group">
+                <label for="guest-phone">Telefone <span class="required-field">*</span></label>
+                <input type="tel" id="guest-phone" placeholder="(00) 00000-0000" required />
+              </div>
+            </div>
+
+            <div class="form-footer">
+              <button type="button" class="btn text-btn">
+                <span>Cancelar</span>
+              </button>
+              <button type="submit" class="btn primary-btn">
+                <i class="ri-save-line"></i>
+                <span>Cadastrar Convidado</span>
+              </button>
+            </div>
+          </form>
+        </div>
+      </section>
+    </main>
+
+    <script src="https://cdn.sheetjs.com/xlsx-0.20.0/package/dist/xlsx.full.min.js"></script>
+    <script>
+      document.addEventListener('DOMContentLoaded', function () {
+        const bubbleContainer = document.getElementById('bubble-container')
+
+        if (bubbleContainer) {
+          for (let i = 0; i < 10; i++) {
+            createBubble()
+          }
+
+          setInterval(createBubble, 2000)
+        }
+
+        function createBubble() {
+          const bubble = document.createElement('div')
+          bubble.classList.add('bubble')
+
+          const size = 10 + Math.random() * 80
+          bubble.style.width = `${size}px`
+          bubble.style.height = `${size}px`
+          bubble.style.left = `${Math.random() * 100}%`
+          bubble.style.animationDuration = `${5 + Math.random() * 10}s`
+          bubble.style.animationDelay = `${Math.random() * 2}s`
+
+          bubble.style.setProperty('--random-x', `${Math.random() * 100 - 50}px`)
+          bubble.style.transform = `translateX(var(--random-x))`
+
+          bubbleContainer.appendChild(bubble)
+
+          setTimeout(
+            () => {
+              bubble.remove()
+            },
+            parseFloat(bubble.style.animationDuration) * 1000,
+          )
+        }
+      })
+    </script>
+    <script type="module" src="/public/js/app.js"></script>
+  </body>
+</html>

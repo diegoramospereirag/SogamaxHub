@@ -1,0 +1,148 @@
+<!doctype html>
+<html lang="pt-br">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Visita Tracker - Login</title>
+    <meta name="description" content="Gerencie seus agendamentos de entrega de forma eficiente" />
+
+    <link rel="stylesheet" href="public/css/login.css" />
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/remixicon@4.6.0/fonts/remixicon.min.css"
+    />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-auth-compat.js"></script>
+  </head>
+
+  <style>
+    .bubble-container {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      z-index: -1;
+      pointer-events: none;
+    }
+
+    .bubble {
+      position: absolute;
+      bottom: -100px;
+      border-radius: 50%;
+      background-color: #062a73;
+      animation: floatUp linear infinite;
+      box-shadow: 0 0 10px rgba(6, 42, 115, 0.1);
+    }
+
+    @keyframes floatUp {
+      0% {
+        transform: translateY(0);
+        opacity: 0.4;
+      }
+      100% {
+        transform: translateY(-120vh);
+        opacity: 0;
+      }
+    }
+  </style>
+
+  <body>
+    <div class="bubble-container" id="bubble-container"></div>
+
+    <main class="login-container">
+      <div class="login">
+        <div class="title-login">
+          <i class="ri-user-location-line box-icon" aria-hidden="true"></i>
+          <h1>SogamaxHub.</h1>
+          <p>Gerencie as visitas e convidados da sua empresa</p>
+        </div>
+
+        <form class="login-form" id="login" autocomplete="on">
+          <div class="form-group">
+            <label for="email">Email</label>
+            <div class="input-field">
+              <i class="ri-user-line input-icon"></i>
+              <input
+                type="email"
+                name="email"
+                id="email"
+                placeholder="seu@email.com"
+                required
+                autocomplete="email"
+              />
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="password">Senha</label>
+            <div class="input-field">
+              <i class="ri-lock-2-line input-icon"></i>
+              <input
+                type="password"
+                name="password"
+                id="password"
+                placeholder="●●●●●●●"
+                required
+                autocomplete="current-password"
+              />
+              <button type="button" class="toggle-password" aria-label="Mostrar senha">
+                <i class="ri-eye-line"></i>
+              </button>
+            </div>
+          </div>
+
+          <button type="submit" class="submit-button">
+            <span class="button-text">Entrar</span>
+          </button>
+        </form>
+      </div>
+    </main>
+
+    <script type="module" src="public/js/login.js"></script>
+    <script>
+      document.addEventListener('DOMContentLoaded', function () {
+        const bubbleContainer = document.getElementById('bubble-container')
+
+        if (bubbleContainer) {
+          for (let i = 0; i < 10; i++) {
+            createBubble()
+          }
+
+          setInterval(createBubble, 2000)
+        }
+
+        function createBubble() {
+          const bubble = document.createElement('div')
+          bubble.classList.add('bubble')
+
+          const size = 10 + Math.random() * 80
+          bubble.style.width = `${size}px`
+          bubble.style.height = `${size}px`
+          bubble.style.left = `${Math.random() * 100}%`
+          bubble.style.animationDuration = `${5 + Math.random() * 10}s`
+          bubble.style.animationDelay = `${Math.random() * 2}s`
+
+          bubble.style.setProperty('--random-x', `${Math.random() * 100 - 50}px`)
+          bubble.style.transform = `translateX(var(--random-x))`
+
+          bubbleContainer.appendChild(bubble)
+
+          setTimeout(
+            () => {
+              bubble.remove()
+            },
+            parseFloat(bubble.style.animationDuration) * 1000,
+          )
+        }
+      })
+    </script>
+  </body>
+</html>
